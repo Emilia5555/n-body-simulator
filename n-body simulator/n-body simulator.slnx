@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="n-body simulator/n-body simulator.vcxproj" Id="3dbb833d-2f44-4811-931c-691ecb5995b2" />
+</Solution>
