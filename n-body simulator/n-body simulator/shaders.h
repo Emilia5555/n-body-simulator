@@ -2,7 +2,7 @@
 
 // vertex shader
 // R prefix for raw string literal
-const char* vertexShadersource = R"(
+const char* vertexShaderSource = R"(
 // use version 3.3 core
 #version 330 core
 // creates inputvarialbe aPos (vec3) at location 0
@@ -18,23 +18,24 @@ void main(){
 	// first view makes the world space into camera space
 	// then projection makes camera space clip space
 	// mutiplying by a matrix is applying a linear transformation
-	gl_Position = projection * view * vec4(aPos, 1.0);
+	gl_Position = vec4(aPos, 1.0);
 };
 )";
 
 // fragmagment shader
-const char* fragmentShadersource = R"(
-// use version 3.3 core
-#version 330 core
-// creates a vec4 output varaible called FragColor
+const char* fragmentShaderSource = R"(
+	// use version 3.3 core
+	#version 330 core
+	// creates a vec4 output varaible called FragColor
+	out vec4 FragColor;
 
-// stores color
-// uniforms are the same for every vertex in one draw call
-uniform vec3 color;
+	// stores color
+	// uniforms are the same for every vertex in one draw call
+	uniform vec3 color;
 
-void main(){
-	// sets FragColor color 
-	FragColor = vec4(color, 1.0)
-}
+	void main(){
+		// sets FragColor color 
+		FragColor = vec4(1.0,1.0, 1.0,1.0);
+	}
 
 )";
