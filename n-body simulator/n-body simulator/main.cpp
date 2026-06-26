@@ -61,27 +61,32 @@ int main() {
 
 	// render two bodies on screen
 	Body body1;
-	body1.position = glm::dvec3(0.0, -0.5, 0.0);
+	body1.position = glm::dvec3(0.3, 0.5, 0.0);
 	body1.velocity = glm::dvec3(0.0, 0.0, 0.0);
 	body1.acceleration = glm::dvec3(0.0, 0.0, 0.0);
-	body1.mass = 0.000001;
+	body1.mass = 10.0;
 
 	Body body2;
-	body2.position = glm::dvec3(0.0, 0.5, 0.0);
+	body2.position = glm::dvec3(-0.3, -0.5, 0.0);
 	body2.velocity = glm::dvec3(0.0, 0.0, 0.0);
 	body2.acceleration = glm::dvec3(0.0, 0.0, 0.0);
-	body2.mass = 0.000001;
+	body2.mass = 5.0;
+
+	// simulation object
+	Simulation simulation;
+	simulation.bodies.push_back(body1);
+	simulation.bodies.push_back(body2);
+
 
 
 	// holds positions of bodies
-	float positionsOfBodies[] = {
-		body1.position.x,
-		body1.position.y,
-		body1.position.z,
-		body2.position.x,
-		body2.position.y,
-		body2.position.z,
-	};
+	std::vector<float> positionsOfBodies;
+	for (Body& body : simulation.bodies) {
+		positionsOfBodies.push_back(body.position.x);
+		positionsOfBodies.push_back(body.position.y);
+		positionsOfBodies.push_back(body.position.z);
+	}
+
 
 
 	// buffer setup
@@ -102,7 +107,7 @@ int main() {
 
 
 	// upload planet data into VBO
-	glBufferData(GL_ARRAY_BUFFER, sizeof(positionsOfBodies), positionsOfBodies, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positionsOfBodies.size(), positionsOfBodies.data(), GL_DYNAMIC_DRAW);
 
 	// tells openGL that VBO has vertex data where each vertex is 3 floats
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -127,42 +132,41 @@ int main() {
 		glBindVertexArray(VAO);
 		glPointSize(25.0f);
 
-		// update bodies positions
-		glm::dvec3 distanceBetweenBodies = body2.position - body1.position;
-		double lengthOfDist = glm::length(distanceBetweenBodies);
-		// get unit vector for direction between 2 bodies
-		glm::dvec3 directionOfDist = distanceBetweenBodies / lengthOfDist;
+		//// update bodies positions
+		//glm::dvec3 distanceBetweenBodies = body2.position - body1.position;
+		//double lengthOfDist = glm::length(distanceBetweenBodies);
+		//// get unit vector for direction between 2 bodies
+		//glm::dvec3 directionOfDist = distanceBetweenBodies / lengthOfDist;
 
-		// F = G *m1 * m2 / (r2 + softening)
-		double force = 1.0 * body1.mass * body2.mass /
-			(lengthOfDist * lengthOfDist + 0.01);
+		//// F = G *m1 * m2 / (r2 + softening)
+		//double force = 1.0 * body1.mass * body2.mass /
+		//	(lengthOfDist * lengthOfDist + 0.01);
 
-		body1.acceleration = (force / body1.mass) * directionOfDist;
-		body2.acceleration = -(force / body2.mass) * directionOfDist;
+		//body1.acceleration = (force / body1.mass) * directionOfDist;
+		//body2.acceleration = -(force / body2.mass) * directionOfDist;
 
-		body1.velocity += body1.acceleration;
-		body2.velocity += body2.acceleration;
+		//body1.velocity += body1.acceleration;
+		//body2.velocity += body2.acceleration;
 
-		body1.position += body1.velocity;
-		body2.position += body2.velocity;
+		//body1.position += body1.velocity;
+		//body2.position += body2.velocity;
 
+		simulation.stepForward();
+
+		positionsOfBodies.clear();
 		// holds positions of bodies
-		float positionsOfBodies[] = {
-			body1.position.x,
-			body1.position.y,
-			body1.position.z,
-			body2.position.x,
-			body2.position.y,
-			body2.position.z,
-		};
-
+		for (Body& body : simulation.bodies) {
+			positionsOfBodies.push_back(body.position.x);
+			positionsOfBodies.push_back(body.position.y);
+			positionsOfBodies.push_back(body.position.z);
+		}
 		// makes our VAO currently active
 		glBindVertexArray(VAO);
 		// makes VBO the current active GL_ARRAY_BUFFER
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 		// upload planet data into VBO
-		glBufferData(GL_ARRAY_BUFFER, sizeof(positionsOfBodies), positionsOfBodies, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*positionsOfBodies.size(), positionsOfBodies.data(), GL_DYNAMIC_DRAW);
 
 		glDrawArrays(GL_POINTS, 0, 2);
 
