@@ -116,12 +116,12 @@ public:
 // extra int parameter to match GLFW
 void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods) {
 	// prevents function from running if mouse is hovering over ImGui panel
-	if (ImGui::GetIO().WantCaptureMouse) {
-		// call ImGui callbacks
-		ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-		// exits function
-		return;
-	}
+	//if (ImGui::GetIO().WantCaptureMouse) {
+	//	// call ImGui callbacks
+	//	ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+	//	// exits function
+	//	return;
+	//}
 
 	// glfw window can a void pointer that can point to anything
 	// cam stores a pointer to my camera object in main
@@ -151,12 +151,12 @@ void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods) {
 // ypos: current cursor y position in pixels
 void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos) {
 	// prevents function from running if mouse is hovering over ImGui panel
-	if (ImGui::GetIO().WantCaptureMouse) {
-		// call ImGui callbacks
-		ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
-		// exits function
-		return;
-	}
+	//if (ImGui::GetIO().WantCaptureMouse) {
+	//	// call ImGui callbacks
+	//	ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
+	//	// exits function
+	//	return;
+	//}
 
 	// points to our camera object in main
 	Camera* cam = static_cast<Camera*>(glfwGetWindowUserPointer(window));
@@ -198,12 +198,12 @@ void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos) {
 // yoffset: how much the scrollbar has moved vertically (up +, down -)
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 	// prevents function from running if mouse is hovering over ImGui panel
-	if (ImGui::GetIO().WantCaptureMouse) {
-		// call ImGui callbacks
-		ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
-		// exits function
-		return;
-	}
+	//if (ImGui::GetIO().WantCaptureMouse) {
+	//	// call ImGui callbacks
+	//	ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+	//	// exits function
+	//	return;
+	//}
 
 	// points to our camera object in main
 	Camera* cam = static_cast<Camera*>(glfwGetWindowUserPointer(window));

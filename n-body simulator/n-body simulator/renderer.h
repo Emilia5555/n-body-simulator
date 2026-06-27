@@ -1,1 +1,83 @@
 #pragma once
+#include <glad/glad.h>
+#include <vector>
+
+
+// creates and configures VAO, VBO, and EBO for bodies
+// deletes anything in buffer objects before creating new ones
+// VAO: int to hold vertex array object ID
+// VBO: int to hold vertex buffer object ID
+// positionAndColor: vector of floats, used to allocate GPU memory to hold position and color of bodies
+void setupBuffersBody(unsigned int& VAO, unsigned int& VBO, std::vector<float>& positionAndColor)
+{
+	// clear anything that was in the buffers
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+
+	// generates ID for vertex array object and stores in VAO
+	glGenVertexArrays(1, &VAO);
+	// generates ID for vertex buffer object and stores in VBO
+	glGenBuffers(1, &VBO);
+
+	// makes our VAO currently active
+	glBindVertexArray(VAO);
+	// makes VBO the current active GL_ARRAY_BUFFER
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+
+	// upload planet data into VBO
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positionAndColor.size(), positionAndColor.data(), GL_DYNAMIC_DRAW);
+
+	// i upload position and color in the same array so there two calls parse through that by taking the first call as position data and the second call as color data
+	// tells openGL that VBO has position data at location 0, which is the 3 floats with no offset
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+
+	// tells openGL that VBO has color data at location a, which is the 3 floats with 3 floats of offset
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+
+	// enables input slot 0
+	glEnableVertexAttribArray(0);
+	// enables input slot 1
+	glEnableVertexAttribArray(1);
+
+	// unbind VAO and VBO
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+// creates and configures VAO, VBO, and EBO for tails
+// deletes anything in buffer objects before creating new ones
+// VAO: int to hold vertex array object ID
+// VBO: int to hold vertex buffer object ID
+void setupBuffersTail(unsigned int& VAO, unsigned int& VBO) 
+{
+	// clear anything that was in the buffers
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+
+	// generates ID for vertex array object and stores in VAO
+	glGenVertexArrays(1, &VAO);
+	// generates ID for vertex buffer object and stores in VBO
+	glGenBuffers(1, &VBO);
+
+	// makes our VAO currently active
+	glBindVertexArray(VAO);
+	// makes VBO the current active GL_ARRAY_BUFFER
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	// allocates space for tail position vector
+	glBufferData(GL_ARRAY_BUFFER, 1500 * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+
+	//tells openGL that VBO has vertex data where each vertex is three floats and the vertexes are three floats apart
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	
+	// enables input slot 0
+	glEnableVertexAttribArray(0);
+
+	// unbind VAO and VBO 
+	// binding 0 is unbinding
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}

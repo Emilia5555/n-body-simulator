@@ -51,3 +51,54 @@ void Simulation::stepForward()
 	body.velocity = newVelocity;
 	}
 }
+
+void Simulation::loadPreset(int presetIndex) {
+	
+	// binary plus orbiter
+	if (presetIndex == 0){
+		bodies.clear();
+		Body body1(
+			// position
+			glm::dvec3(-0.5, 0.0, 0.0),
+			// velocity
+			glm::dvec3(0.0, -0.5, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.0, 0.0, 1.0)
+		);
+		Body body2(
+			// position
+			glm::dvec3(0.5, 0.0, 0.0),
+			// velocity
+			glm::dvec3(0.0, 0.5, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.0, 1.0, 0.0)
+		);
+
+		Body body3(
+			// position
+			glm::dvec3(0.0, 0.8, 0.0),
+			// velocity
+			glm::dvec3(0.0, -0.0, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			0.1,
+			// color
+			glm::vec3(1.0, 0.0, 0.0)
+		);
+
+		bodies.push_back(body1);
+		bodies.push_back(body2);
+		bodies.push_back(body3);
+	}
+
+
+}

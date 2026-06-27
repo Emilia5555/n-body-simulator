@@ -7,7 +7,11 @@
 #include <cmath>
 #include "body.h"
 #include "simulation.h"
-
+#include "camera.h"
+#include "renderer.h"
+// matrix
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 int main() {
 
 	// GLFW setup
@@ -59,65 +63,70 @@ int main() {
 	// create shader program
 	unsigned int shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
 
-	// render two bodies on screen
-	Body body1;
-	body1.position = glm::dvec3(0.3, 0.5, 0.0);
-	body1.velocity = glm::dvec3(0.0, 0.0, 0.0);
-	body1.acceleration = glm::dvec3(0.0, 0.0, 0.0);
-	body1.mass = 10.0;
-
-	Body body2;
-	body2.position = glm::dvec3(-0.3, -0.5, 0.0);
-	body2.velocity = glm::dvec3(0.0, 0.0, 0.0);
-	body2.acceleration = glm::dvec3(0.0, 0.0, 0.0);
-	body2.mass = 5.0;
 
 	// simulation object
 	Simulation simulation;
-	simulation.bodies.push_back(body1);
-	simulation.bodies.push_back(body2);
+	
 
-
+	simulation.loadPreset(0);
 
 	// holds positions of bodies
-	std::vector<float> positionsOfBodies;
+	// cast to a float becasue openGL does not nativley have doubles
+	std::vector<float> positionAndColor;
 	for (Body& body : simulation.bodies) {
-		positionsOfBodies.push_back(body.position.x);
-		positionsOfBodies.push_back(body.position.y);
-		positionsOfBodies.push_back(body.position.z);
+		positionAndColor.push_back(body.position.x);
+		positionAndColor.push_back(body.position.y);
+		positionAndColor.push_back(body.position.z);
+		positionAndColor.push_back(body.color.x);
+		positionAndColor.push_back(body.color.y);
+		positionAndColor.push_back(body.color.z);
 	}
 
 
 
 	// buffer setup
 	// holds ID for vertex array object
-	unsigned int VAO = 0;
+	unsigned int bodyVAO = 0;
 	// holds ID for vertex buffer object
-	unsigned int VBO = 0;
+	unsigned int bodyVBO = 0;
 
-	// generates ID for vertex array object and stores in VAO
-	glGenVertexArrays(1, &VAO);
-	// generates ID for vertex buffer object and stores in VBO
-	glGenBuffers(1, &VBO);
+	// holds ID for vertex array object
+	unsigned int tailVAO = 0;
+	// holds ID for vertex buffer object
+	unsigned int tailVBO = 0;
 
-	// makes our VAO currently active
-	glBindVertexArray(VAO);
-	// makes VBO the current active GL_ARRAY_BUFFER
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	setupBuffersBody(bodyVAO, bodyVBO,positionAndColor);
 
+	setupBuffersTail(tailVAO,tailVBO);
 
-	// upload planet data into VBO
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positionsOfBodies.size(), positionsOfBodies.data(), GL_DYNAMIC_DRAW);
+	// create camera
+	Camera camera(
+		// set position to (0,0,3)
+		glm::vec3(0.0f, 0.0f, 3.0f),
+		// set target to (0,0,0)
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		// set (0,1,0) as the direction of "up"
+		glm::vec3(0.0f, 1.0f, 0.0f),
+		// set field of view to 45 degrees
+		45.0f,
+		// set the aspect ratio as the window width/height
+		(WINDOW_WIDTH / WINDOW_HEIGHT),
+		// set the near plane to 0.1 world units
+		0.1f,
+		// set the far plane to 100 world units
+		100.0f
+	);
 
-	// tells openGL that VBO has vertex data where each vertex is 3 floats
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	// enables input slot 0
-	glEnableVertexAttribArray(0);
+	// store camera pointer on glfw window so callbacks can access it
+	glfwSetWindowUserPointer(window, &camera);
+	// set glfw callback functions to my callback functions for mouse events
+	// these get called if the event is detected by glfwPollEvents
+	glfwSetMouseButtonCallback(window, mouseButtonCallBack);
+	glfwSetCursorPosCallback(window, mouseMoveCallback);
+	glfwSetScrollCallback(window, scrollCallback);
 
-	// unbind VAO and VBO
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+	// update camera positions
+	camera.updateOrbit();
 
 	// while the user has not closed the window 
 	while (!glfwWindowShouldClose(window))
@@ -129,46 +138,79 @@ int main() {
 		// makes the draw call use the correct shader program
 		glUseProgram(shaderProgram);
 
-		glBindVertexArray(VAO);
+
+		// get view and projection matrix every frame
+		glm::mat4 view = camera.getViewMatrix();
+		glm::mat4 projection = camera.getProjectionMatrix();
+
+		// send camera matrices to the GPU
+		// glGetUniformLocation() gets view uniform from shader and returns int ID for that variables slot 
+		// glUniformMatrix4fv uploads a 4x4 float matrix to that slot on the GPU
+		// requires the raw float data of the matrix
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+
+		glBindVertexArray(bodyVAO);
 		glPointSize(25.0f);
 
-		//// update bodies positions
-		//glm::dvec3 distanceBetweenBodies = body2.position - body1.position;
-		//double lengthOfDist = glm::length(distanceBetweenBodies);
-		//// get unit vector for direction between 2 bodies
-		//glm::dvec3 directionOfDist = distanceBetweenBodies / lengthOfDist;
-
-		//// F = G *m1 * m2 / (r2 + softening)
-		//double force = 1.0 * body1.mass * body2.mass /
-		//	(lengthOfDist * lengthOfDist + 0.01);
-
-		//body1.acceleration = (force / body1.mass) * directionOfDist;
-		//body2.acceleration = -(force / body2.mass) * directionOfDist;
-
-		//body1.velocity += body1.acceleration;
-		//body2.velocity += body2.acceleration;
-
-		//body1.position += body1.velocity;
-		//body2.position += body2.velocity;
-
-		simulation.stepForward();
-
-		positionsOfBodies.clear();
-		// holds positions of bodies
-		for (Body& body : simulation.bodies) {
-			positionsOfBodies.push_back(body.position.x);
-			positionsOfBodies.push_back(body.position.y);
-			positionsOfBodies.push_back(body.position.z);
+		// repeat step forward 5 times per frame
+		for (int i = 0; i < 6; i++) {
+			simulation.stepForward();
 		}
+		// for all bodies
+		for (Body& body : simulation.bodies) {
+			// if tail vector is too big start deleting the from front element
+			if (body.prevPositions.size() >= 500) {
+				body.prevPositions.erase(body.prevPositions.begin());
+			}
+			// add position to prevPostitions to create tail
+			body.prevPositions.push_back(body.position);
+		}
+
+		// get rid of old positions
+		positionAndColor.clear();
+		// holds positions and color of bodies
+		for (Body& body : simulation.bodies) {
+			positionAndColor.push_back(body.position.x);
+			positionAndColor.push_back(body.position.y);
+			positionAndColor.push_back(body.position.z);
+			positionAndColor.push_back(body.color.x);
+			positionAndColor.push_back(body.color.y);
+			positionAndColor.push_back(body.color.z);
+		}
+
+		// holds positions of tails
+		std::vector<float> tailPositions;
+		for (Body& body : simulation.bodies) 
+		{
+			// clear before re-using
+			tailPositions.clear();
+			// loop through prevPositions
+			for (glm::vec3 pos : body.prevPositions) 
+			{
+				// create a tail positions flat float vector for each body
+				tailPositions.push_back(pos.x);
+				tailPositions.push_back(pos.y);
+				tailPositions.push_back(pos.z);
+			}
+			
+			// upload this trail info with glVertexAtribPointer
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tailPositions.size(), tailPositions.data(), GL_DYNAMIC_DRAW);
+			// draw the tail
+			glDrawArrays(GL_LINE_STRIP, 0, tailPositions.size());
+		}
+
 		// makes our VAO currently active
-		glBindVertexArray(VAO);
+		glBindVertexArray(bodyVAO);
 		// makes VBO the current active GL_ARRAY_BUFFER
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, bodyVBO);
 
-		// upload planet data into VBO
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*positionsOfBodies.size(), positionsOfBodies.data(), GL_DYNAMIC_DRAW);
-
-		glDrawArrays(GL_POINTS, 0, 2);
+		// upload body data into VBO
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float)* positionAndColor.size(), positionAndColor.data(), GL_DYNAMIC_DRAW);
+		
+		glEnable(GL_PROGRAM_POINT_SIZE);
+		glDrawArrays(GL_POINTS, 0, simulation.bodies.size());
 
 		// prevents screen from flickering by drawing to a back buffer and then swapping it to the front
 		glfwSwapBuffers(window);
