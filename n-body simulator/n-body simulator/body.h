@@ -20,7 +20,7 @@ public:
 		velocity = glm::dvec3(0.0, 0.0, 0.0);
 		acceleration = glm::dvec3(0.0, 0.0, 0.0);
 		mass = 0.1;
-		color = glm::vec3(0.0f, 0.0f, 0.0f);
+		color = glm::vec3(1.0f, 1.0f, 1.0f);
 	}
 
 	// constructor

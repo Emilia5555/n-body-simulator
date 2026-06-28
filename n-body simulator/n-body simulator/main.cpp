@@ -97,7 +97,9 @@ int main() {
 
 	setupBuffersBody(bodyVAO, bodyVBO,positionAndColor);
 
-	setupBuffersTail(tailVAO,tailVBO);
+	// holds positions of tails
+	std::vector<float> tailPositionsAndColor;
+	setupBuffersTail(tailVAO,tailVBO, tailPositionsAndColor);
 
 	// create camera
 	Camera camera(
@@ -128,11 +130,75 @@ int main() {
 	// update camera positions
 	camera.updateOrbit();
 
+	// positions and color for axis
+	std::vector<float> axisPosAndColor;
+	// x top
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(0.0);
+	axisPosAndColor.push_back(0.0);
+	// make it white 
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	// x bottom
+	axisPosAndColor.push_back(-1.0);
+	axisPosAndColor.push_back(0.0);
+	axisPosAndColor.push_back(0.0);
+	// make it white 
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	// y top
+	axisPosAndColor.push_back(0.0);
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(0.0);
+	// make it white 
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	// y bottom
+	axisPosAndColor.push_back(0.0);
+	axisPosAndColor.push_back(-1.0);
+	axisPosAndColor.push_back(0.0);
+	// make it white 
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	// z top
+	axisPosAndColor.push_back(0.0);
+	axisPosAndColor.push_back(0.0);
+	axisPosAndColor.push_back(1.0);
+	// make it white 
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	// z bottom
+	axisPosAndColor.push_back(0.0);
+	axisPosAndColor.push_back(0.0);
+	axisPosAndColor.push_back(-1.0);
+	// make it white 
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(1.0);
+
+	// buffer setup for axis
+	// holds ID for vertex array object
+	unsigned int axisVAO = 0;
+	// holds ID for vertex buffer object
+	unsigned int axisVBO = 0;
+
+	setupBuffersAxis(axisVAO, axisVBO,axisPosAndColor);
+
+
+	
+
+
+
 	// while the user has not closed the window 
 	while (!glfwWindowShouldClose(window))
 	{
 		// indicates color to set background (red,green, blue, alpha) uses 0-1 scale, expects float values
-		glClearColor(0.067f, 0.071f, 0.102f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.02f, 1.0f);
 		// sets the color 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// makes the draw call use the correct shader program
@@ -150,6 +216,20 @@ int main() {
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+		// draw axis
+		// makes our axis VAO currently active
+		glBindVertexArray(axisVAO);
+		// makes VBO the current active GL_ARRAY_BUFFER
+		glBindBuffer(GL_ARRAY_BUFFER, axisVBO);
+
+		// tell my fragment shader this is not a body
+		glUniform1i(glGetUniformLocation(shaderProgram, "isPoint"), 0);
+
+		// draw the axis
+		glDrawArrays(GL_LINES, 0, axisPosAndColor.size() / 6);
+
+
+
 
 		glBindVertexArray(bodyVAO);
 		glPointSize(25.0f);
@@ -161,7 +241,7 @@ int main() {
 		// for all bodies
 		for (Body& body : simulation.bodies) {
 			// if tail vector is too big start deleting the from front element
-			if (body.prevPositions.size() >= 500) {
+			if (body.prevPositions.size() >= 800) {
 				body.prevPositions.erase(body.prevPositions.begin());
 			}
 			// add position to prevPostitions to create tail
@@ -172,33 +252,51 @@ int main() {
 		positionAndColor.clear();
 		// holds positions and color of bodies
 		for (Body& body : simulation.bodies) {
+			// push back 3 floats for position
 			positionAndColor.push_back(body.position.x);
 			positionAndColor.push_back(body.position.y);
 			positionAndColor.push_back(body.position.z);
+			// push back 3 floats for color
 			positionAndColor.push_back(body.color.x);
 			positionAndColor.push_back(body.color.y);
 			positionAndColor.push_back(body.color.z);
 		}
 
-		// holds positions of tails
-		std::vector<float> tailPositions;
+		
 		for (Body& body : simulation.bodies) 
 		{
 			// clear before re-using
-			tailPositions.clear();
+			tailPositionsAndColor.clear();
 			// loop through prevPositions
 			for (glm::vec3 pos : body.prevPositions) 
 			{
 				// create a tail positions flat float vector for each body
-				tailPositions.push_back(pos.x);
-				tailPositions.push_back(pos.y);
-				tailPositions.push_back(pos.z);
+				// push back 3 floats for color
+				tailPositionsAndColor.push_back(pos.x);
+				tailPositionsAndColor.push_back(pos.y);
+				tailPositionsAndColor.push_back(pos.z);
+				// push back 3 floats for color
+				tailPositionsAndColor.push_back(body.color.x);
+				tailPositionsAndColor.push_back(body.color.y);
+				tailPositionsAndColor.push_back(body.color.z);
+
+
 			}
-			
+			// makes our tail VAO currently active
+			glBindVertexArray(tailVAO);
+			// makes VBO the current active GL_ARRAY_BUFFER
+			glBindBuffer(GL_ARRAY_BUFFER, tailVBO);
 			// upload this trail info with glVertexAtribPointer
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tailPositions.size(), tailPositions.data(), GL_DYNAMIC_DRAW);
-			// draw the tail
-			glDrawArrays(GL_LINE_STRIP, 0, tailPositions.size());
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tailPositionsAndColor.size(), tailPositionsAndColor.data(), GL_DYNAMIC_DRAW);
+			
+			// tell my fragment shader this is not a body
+			glUniform1i(glGetUniformLocation(shaderProgram, "isPoint"), 0);
+
+			// set tail thickness
+			glLineWidth(3.0f);
+
+			// draw the tail (tailPositionsAndColor.size()/3 because its looking for vertices to draw)
+			glDrawArrays(GL_LINE_STRIP, 0, tailPositionsAndColor.size()/6);
 		}
 
 		// makes our VAO currently active
@@ -210,6 +308,10 @@ int main() {
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float)* positionAndColor.size(), positionAndColor.data(), GL_DYNAMIC_DRAW);
 		
 		glEnable(GL_PROGRAM_POINT_SIZE);
+
+		// tell my fragment shader this is a body
+		glUniform1i(glGetUniformLocation(shaderProgram, "isPoint"), 1);
+
 		glDrawArrays(GL_POINTS, 0, simulation.bodies.size());
 
 		// prevents screen from flickering by drawing to a back buffer and then swapping it to the front

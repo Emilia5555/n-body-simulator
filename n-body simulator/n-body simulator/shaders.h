@@ -35,9 +35,14 @@ const char* fragmentShaderSource = R"(
 	// creates a vec4 output varaible called FragColor
 	out vec4 FragColor;
 	in vec3 vertexColor;
-
+	uniform int isPoint;
 
 	void main(){
+		// dont render anything outside 0.5 from the point center
+		if (distance(gl_PointCoord,vec2(0.5,0.5)) > 0.5 && isPoint == 1)
+		{
+			discard;
+		}
 		// sets FragColor color 
 		FragColor = vec4(vertexColor,1.0);
 	}
