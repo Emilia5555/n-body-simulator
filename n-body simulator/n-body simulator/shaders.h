@@ -34,7 +34,7 @@ const char* bodyFragmentShaderSource = R"(
 	#version 330 core
 	// creates a vec4 output varaible called FragColor
 	out vec4 FragColor;
-	in vec3 vertexColor;
+	uniform vec3 vertexColor;
 
 	void main(){
 		// dont render anything outside 0.5 from the point center

@@ -54,7 +54,7 @@ void Simulation::stepForward()
 
 void Simulation::loadPreset(int presetIndex) {
 	
-	// binary plus orbiter
+	// test preset
 	if (presetIndex == 0){
 		bodies.clear();
 		Body body1(
@@ -114,5 +114,53 @@ void Simulation::loadPreset(int presetIndex) {
 		bodies.push_back(body4);
 	}
 
+	// figure 8 preset 
+	if (presetIndex == 1) {
+		softening = 0.0;
+		dt = 0.00005;
+		bodies.clear();
+		Body body1(
+			// position
+			glm::dvec3(0.97000436, -0.24308753, 0),
+			// velocity
+			glm::dvec3(0.466203685, 0.43236573, 0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.365f, 0.976f, 1.0f)
+		);
+		Body body2(
+			// position
+			glm::dvec3(-0.97000436, 0.24308753, 0),
+			// velocity
+			glm::dvec3(0.466203685, 0.43236573, 0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.478f, 1.0f, 0.69f)
+		);
+
+		Body body3(
+			// position
+			glm::dvec3(0.0, 0.0, 0.0),
+			// velocity
+			glm::dvec3(-0.93240737, -0.86473146, 0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(1.0f, 0.243f, 0.243f)
+
+		);
+	
+		bodies.push_back(body1);
+		bodies.push_back(body2);
+		bodies.push_back(body3);
+	}
 
 }

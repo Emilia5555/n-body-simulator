@@ -60,7 +60,7 @@ int main() {
 	// make objects appear infront or behind eachother
 	glEnable(GL_DEPTH_TEST);
 
-	// create shader program
+	// create shader programs
 	unsigned int bodyShaderProgram = createShaderProgram(vertexShaderSource, bodyFragmentShaderSource);
 	unsigned int lineShaderProgram = createShaderProgram(vertexShaderSource, lineFragmentShaderSource);
 
@@ -68,20 +68,7 @@ int main() {
 	Simulation simulation;
 	
 	// set which orbit the bodies should move
-	simulation.loadPreset(0);
-
-	// holds positions of bodies
-	// cast to a float becasue openGL does not nativley have doubles
-	std::vector<float> positionAndColor;
-	for (Body& body : simulation.bodies) {
-		positionAndColor.push_back(body.position.x);
-		positionAndColor.push_back(body.position.y);
-		positionAndColor.push_back(body.position.z);
-		positionAndColor.push_back(body.color.x);
-		positionAndColor.push_back(body.color.y);
-		positionAndColor.push_back(body.color.z);
-	}
-
+	simulation.loadPreset(1);
 
 
 	// buffer setup
@@ -95,6 +82,10 @@ int main() {
 	// holds ID for vertex buffer object
 	unsigned int tailVBO = 0;
 
+
+	// holds positions of bodies
+	// cast to a float becasue openGL does not nativley have doubles
+	std::vector<float> positionAndColor;
 	setupBuffersBody(bodyVAO, bodyVBO,positionAndColor);
 
 	// holds positions of tails
@@ -179,9 +170,7 @@ int main() {
 		glClearColor(0.0f, 0.0f, 0.02f, 1.0f);
 		// sets the color 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-
-
+	
 		// get view and projection matrix every frame
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix();
@@ -213,45 +202,56 @@ int main() {
 		glDrawArrays(GL_LINES, 0, axisPosAndColor.size() / 3);
 
 
-		// repeat step forward 3 times per frame
-		for (int i = 0; i < 4; i++) {
+		// repeat step forward a few times per frame to control speed
+		for (int i = 0; i < 46; i++) {
 			simulation.stepForward();
 		}
-		// create tail
+
+		// holds positions and color of bodies
 		for (Body& body : simulation.bodies) {
+			// get rid of old positions
+			positionAndColor.clear();
+			// push back 3 floats for position
+			positionAndColor.push_back(body.position.x);
+			positionAndColor.push_back(body.position.y);
+			positionAndColor.push_back(body.position.z);
+			// push back 3 floats for color
+			//positionAndColor.push_back(body.color.x);
+			//positionAndColor.push_back(body.color.y);
+			//positionAndColor.push_back(body.color.z);
+
+			// draw bodies
+			glUseProgram(bodyShaderProgram);
+			// set buffers for body
+			glBindVertexArray(bodyVAO);
+			glBindBuffer(GL_ARRAY_BUFFER, bodyVBO);
+			// set point size
+			glPointSize(25.0f);
+			glEnable(GL_PROGRAM_POINT_SIZE);
+			//set color of body
+			glUniform3f(glGetUniformLocation(bodyShaderProgram, "vertexColor"), body.color.x, body.color.y, body.color.z);
+			// upload body data into VBO
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positionAndColor.size(), positionAndColor.data(), GL_DYNAMIC_DRAW);
+			glDrawArrays(GL_POINTS, 0, 1);
+
+		}
+
+		// make a float vector representing the prevPositions of the bodies
+		for (Body& body : simulation.bodies) 
+		{
 			// if tail vector is too big start deleting the from front element
 			if (body.prevPositions.size() >= 800) {
 				body.prevPositions.erase(body.prevPositions.begin());
 			}
 			// add position to prevPostitions to create tail
 			body.prevPositions.push_back(body.position);
-		}
 
-		// make a float vector representing the current positions of the bodies
-		// get rid of old positions
-		positionAndColor.clear();
-		// holds positions and color of bodies
-		for (Body& body : simulation.bodies) {
-			// push back 3 floats for position
-			positionAndColor.push_back(body.position.x);
-			positionAndColor.push_back(body.position.y);
-			positionAndColor.push_back(body.position.z);
-			// push back 3 floats for color
-			positionAndColor.push_back(body.color.x);
-			positionAndColor.push_back(body.color.y);
-			positionAndColor.push_back(body.color.z);
-		}
-
-		// make a float vector representing the prevPositions of the bodies
-		for (Body& body : simulation.bodies) 
-		{
 			// clear before re-using
 			tailPositionsAndColor.clear();
 			// loop through prevPositions
 			for (glm::vec3 pos : body.prevPositions) 
 			{
 				// create a tail positions flat float vector for each body
-				// push back 3 floats for color
 				tailPositionsAndColor.push_back(pos.x);
 				tailPositionsAndColor.push_back(pos.y);
 				tailPositionsAndColor.push_back(pos.z);
@@ -271,20 +271,6 @@ int main() {
 			// draw the tail (tailPositionsAndColor.size()/3 because its looking for vertices to draw)
 			glDrawArrays(GL_LINE_STRIP, 0, tailPositionsAndColor.size() / 3);
 		}
-
-
-		// draw bodies
-		glUseProgram(bodyShaderProgram);
-		// set buffers for body
-		glBindVertexArray(bodyVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, bodyVBO);
-		// set point size
-		glPointSize(25.0f);
-		glEnable(GL_PROGRAM_POINT_SIZE);
-		// upload body data into VBO
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float)* positionAndColor.size(), positionAndColor.data(), GL_DYNAMIC_DRAW);
-
-		glDrawArrays(GL_POINTS, 0, simulation.bodies.size());
 
 		// prevents screen from flickering by drawing to a back buffer and then swapping it to the front
 		glfwSwapBuffers(window);

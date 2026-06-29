@@ -27,12 +27,8 @@ void setupBuffersBody(unsigned int& VAO, unsigned int& VBO, std::vector<float>& 
 	// upload planet data into VBO
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positionAndColor.size(), positionAndColor.data(), GL_DYNAMIC_DRAW);
 
-	// i upload position and color in the same array so there two calls parse through that by taking the first call as position data and the second call as color data
 	// tells openGL that VBO has position data at location 0, which is the 3 floats with no offset
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-
-	// tells openGL that VBO has color data at location a, which is the 3 floats with 3 floats of offset
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 
 	// enables input slot 0
@@ -70,7 +66,6 @@ void setupBuffersTail(unsigned int& VAO, unsigned int& VBO, std::vector<float> t
 	// allocates space for tail position vector
 	glBufferData(GL_ARRAY_BUFFER, tailPositionsAndColor.size() * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
 
-	// parse through tailPositionsAndColor the way i did it in the first setupFunction
 	// tells openGL that VBO has position data at location 0, which is the 3 floats with no offset
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
@@ -109,12 +104,8 @@ void setupBuffersAxis(unsigned int& VAO, unsigned int& VBO, std::vector<float> a
 	// allocates space for tail position vector
 	glBufferData(GL_ARRAY_BUFFER, axisPosAndColor.size() * sizeof(float), axisPosAndColor.data(), GL_STATIC_DRAW);
 
-	// parse through axisPosAndColor the way i did it in the first setupFunction
 	// tells openGL that VBO has position data at location 0, which is the 3 floats with no offset
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-	//// tells openGL that VBO has color data at location a, which is the 3 floats with 3 floats of offset
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
 	// enables input slot 0
 	glEnableVertexAttribArray(0);
