@@ -24,7 +24,6 @@ void setupBuffersBody(unsigned int& VAO, unsigned int& VBO, std::vector<float>& 
 	// makes VBO the current active GL_ARRAY_BUFFER
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-
 	// upload planet data into VBO
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positionAndColor.size(), positionAndColor.data(), GL_DYNAMIC_DRAW);
 
@@ -73,10 +72,7 @@ void setupBuffersTail(unsigned int& VAO, unsigned int& VBO, std::vector<float> t
 
 	// parse through tailPositionsAndColor the way i did it in the first setupFunction
 	// tells openGL that VBO has position data at location 0, which is the 3 floats with no offset
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-
-	// tells openGL that VBO has color data at location a, which is the 3 floats with 3 floats of offset
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	// enables input slot 0
 	glEnableVertexAttribArray(0);
@@ -115,10 +111,10 @@ void setupBuffersAxis(unsigned int& VAO, unsigned int& VBO, std::vector<float> a
 
 	// parse through axisPosAndColor the way i did it in the first setupFunction
 	// tells openGL that VBO has position data at location 0, which is the 3 floats with no offset
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-	// tells openGL that VBO has color data at location a, which is the 3 floats with 3 floats of offset
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	//// tells openGL that VBO has color data at location a, which is the 3 floats with 3 floats of offset
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
 	// enables input slot 0
 	glEnableVertexAttribArray(0);

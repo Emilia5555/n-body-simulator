@@ -61,13 +61,13 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	// create shader program
-	unsigned int shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
-
+	unsigned int bodyShaderProgram = createShaderProgram(vertexShaderSource, bodyFragmentShaderSource);
+	unsigned int lineShaderProgram = createShaderProgram(vertexShaderSource, lineFragmentShaderSource);
 
 	// simulation object
 	Simulation simulation;
 	
-
+	// set which orbit the bodies should move
 	simulation.loadPreset(0);
 
 	// holds positions of bodies
@@ -133,53 +133,35 @@ int main() {
 	// positions and color for axis
 	std::vector<float> axisPosAndColor;
 	// x top
-	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(5.0);
 	axisPosAndColor.push_back(0.0);
 	axisPosAndColor.push_back(0.0);
-	// make it white 
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
+
 	// x bottom
-	axisPosAndColor.push_back(-1.0);
+	axisPosAndColor.push_back(-5.0);
 	axisPosAndColor.push_back(0.0);
 	axisPosAndColor.push_back(0.0);
-	// make it white 
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
+
 	// y top
 	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(5.0);
 	axisPosAndColor.push_back(0.0);
-	// make it white 
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
+
 	// y bottom
 	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(-1.0);
+	axisPosAndColor.push_back(-5.0);
 	axisPosAndColor.push_back(0.0);
-	// make it white 
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
+
 	// z top
 	axisPosAndColor.push_back(0.0);
 	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(1.0);
-	// make it white 
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(5.0);
+
 	// z bottom
 	axisPosAndColor.push_back(0.0);
 	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(-1.0);
-	// make it white 
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
-	axisPosAndColor.push_back(1.0);
+	axisPosAndColor.push_back(-5.0);
+
 
 	// buffer setup for axis
 	// holds ID for vertex array object
@@ -190,10 +172,6 @@ int main() {
 	setupBuffersAxis(axisVAO, axisVBO,axisPosAndColor);
 
 
-	
-
-
-
 	// while the user has not closed the window 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -201,44 +179,45 @@ int main() {
 		glClearColor(0.0f, 0.0f, 0.02f, 1.0f);
 		// sets the color 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// makes the draw call use the correct shader program
-		glUseProgram(shaderProgram);
+		
 
 
 		// get view and projection matrix every frame
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix();
 
-		// send camera matrices to the GPU
+		// send camera matrices to the GPU for all shaders
 		// glGetUniformLocation() gets view uniform from shader and returns int ID for that variables slot 
 		// glUniformMatrix4fv uploads a 4x4 float matrix to that slot on the GPU
 		// requires the raw float data of the matrix
-		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		// set shader program
+		glUseProgram(bodyShaderProgram);
+		glUniformMatrix4fv(glGetUniformLocation(bodyShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(bodyShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+		// set shader program
+		glUseProgram(lineShaderProgram);
+		glUniformMatrix4fv(glGetUniformLocation(lineShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(lineShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 		// draw axis
 		// makes our axis VAO currently active
 		glBindVertexArray(axisVAO);
 		// makes VBO the current active GL_ARRAY_BUFFER
 		glBindBuffer(GL_ARRAY_BUFFER, axisVBO);
-
-		// tell my fragment shader this is not a body
-		glUniform1i(glGetUniformLocation(shaderProgram, "isPoint"), 0);
-
+		// upload data
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * axisPosAndColor.size(), axisPosAndColor.data(), GL_STATIC_DRAW);
+		// set axis color
+		glUniform3f(glGetUniformLocation(lineShaderProgram, "lineColor"), 0.431, 0.431, 0.431);
 		// draw the axis
-		glDrawArrays(GL_LINES, 0, axisPosAndColor.size() / 6);
+		glDrawArrays(GL_LINES, 0, axisPosAndColor.size() / 3);
 
 
-
-
-		glBindVertexArray(bodyVAO);
-		glPointSize(25.0f);
-
-		// repeat step forward 5 times per frame
-		for (int i = 0; i < 6; i++) {
+		// repeat step forward 3 times per frame
+		for (int i = 0; i < 4; i++) {
 			simulation.stepForward();
 		}
-		// for all bodies
+		// create tail
 		for (Body& body : simulation.bodies) {
 			// if tail vector is too big start deleting the from front element
 			if (body.prevPositions.size() >= 800) {
@@ -248,6 +227,7 @@ int main() {
 			body.prevPositions.push_back(body.position);
 		}
 
+		// make a float vector representing the current positions of the bodies
 		// get rid of old positions
 		positionAndColor.clear();
 		// holds positions and color of bodies
@@ -262,7 +242,7 @@ int main() {
 			positionAndColor.push_back(body.color.z);
 		}
 
-		
+		// make a float vector representing the prevPositions of the bodies
 		for (Body& body : simulation.bodies) 
 		{
 			// clear before re-using
@@ -275,42 +255,34 @@ int main() {
 				tailPositionsAndColor.push_back(pos.x);
 				tailPositionsAndColor.push_back(pos.y);
 				tailPositionsAndColor.push_back(pos.z);
-				// push back 3 floats for color
-				tailPositionsAndColor.push_back(body.color.x);
-				tailPositionsAndColor.push_back(body.color.y);
-				tailPositionsAndColor.push_back(body.color.z);
-
-
 			}
+			// set shader program
+			glUseProgram(lineShaderProgram);
 			// makes our tail VAO currently active
 			glBindVertexArray(tailVAO);
 			// makes VBO the current active GL_ARRAY_BUFFER
 			glBindBuffer(GL_ARRAY_BUFFER, tailVBO);
 			// upload this trail info with glVertexAtribPointer
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tailPositionsAndColor.size(), tailPositionsAndColor.data(), GL_DYNAMIC_DRAW);
-			
-			// tell my fragment shader this is not a body
-			glUniform1i(glGetUniformLocation(shaderProgram, "isPoint"), 0);
-
 			// set tail thickness
 			glLineWidth(3.0f);
-
+			// set color of tail
+			glUniform3f(glGetUniformLocation(lineShaderProgram, "lineColor"), body.color.x, body.color.y, body.color.z );
 			// draw the tail (tailPositionsAndColor.size()/3 because its looking for vertices to draw)
-			glDrawArrays(GL_LINE_STRIP, 0, tailPositionsAndColor.size()/6);
+			glDrawArrays(GL_LINE_STRIP, 0, tailPositionsAndColor.size() / 3);
 		}
 
-		// makes our VAO currently active
-		glBindVertexArray(bodyVAO);
-		// makes VBO the current active GL_ARRAY_BUFFER
-		glBindBuffer(GL_ARRAY_BUFFER, bodyVBO);
 
+		// draw bodies
+		glUseProgram(bodyShaderProgram);
+		// set buffers for body
+		glBindVertexArray(bodyVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, bodyVBO);
+		// set point size
+		glPointSize(25.0f);
+		glEnable(GL_PROGRAM_POINT_SIZE);
 		// upload body data into VBO
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float)* positionAndColor.size(), positionAndColor.data(), GL_DYNAMIC_DRAW);
-		
-		glEnable(GL_PROGRAM_POINT_SIZE);
-
-		// tell my fragment shader this is a body
-		glUniform1i(glGetUniformLocation(shaderProgram, "isPoint"), 1);
 
 		glDrawArrays(GL_POINTS, 0, simulation.bodies.size());
 

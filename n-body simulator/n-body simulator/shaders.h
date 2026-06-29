@@ -28,18 +28,17 @@ void main(){
 };
 )";
 
-// fragmagment shader
-const char* fragmentShaderSource = R"(
+// fragmagment shaders
+const char* bodyFragmentShaderSource = R"(
 	// use version 3.3 core
 	#version 330 core
 	// creates a vec4 output varaible called FragColor
 	out vec4 FragColor;
 	in vec3 vertexColor;
-	uniform int isPoint;
 
 	void main(){
 		// dont render anything outside 0.5 from the point center
-		if (distance(gl_PointCoord,vec2(0.5,0.5)) > 0.5 && isPoint == 1)
+		if (distance(gl_PointCoord,vec2(0.5,0.5)) > 0.5)
 		{
 			discard;
 		}
@@ -48,3 +47,19 @@ const char* fragmentShaderSource = R"(
 	}
 
 )";
+
+const char* lineFragmentShaderSource = R"(
+	// use version 3.3 core
+	#version 330 core
+	// creates a vec4 output varaible called FragColor
+	out vec4 FragColor;
+	uniform vec3 lineColor;
+
+	void main(){
+	
+		// sets FragColor color 
+		FragColor = vec4(lineColor, 1.0);
+	}
+
+)";
+
