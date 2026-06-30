@@ -121,9 +121,9 @@ void Simulation::loadPreset(int presetIndex) {
 		bodies.clear();
 		Body body1(
 			// position
-			glm::dvec3(0.97000436, -0.24308753, 0),
+			glm::dvec3(0.97000436, -0.24308753, 0.0),
 			// velocity
-			glm::dvec3(0.466203685, 0.43236573, 0),
+			glm::dvec3(0.466203685, 0.43236573, 0.0),
 			// acceleration
 			glm::dvec3(0.0, 0.0, 0.0),
 			// mass
@@ -133,9 +133,9 @@ void Simulation::loadPreset(int presetIndex) {
 		);
 		Body body2(
 			// position
-			glm::dvec3(-0.97000436, 0.24308753, 0),
+			glm::dvec3(-0.97000436, 0.24308753, 0.0),
 			// velocity
-			glm::dvec3(0.466203685, 0.43236573, 0),
+			glm::dvec3(0.466203685, 0.43236573, 0.0),
 			// acceleration
 			glm::dvec3(0.0, 0.0, 0.0),
 			// mass
@@ -148,7 +148,7 @@ void Simulation::loadPreset(int presetIndex) {
 			// position
 			glm::dvec3(0.0, 0.0, 0.0),
 			// velocity
-			glm::dvec3(-0.93240737, -0.86473146, 0),
+			glm::dvec3(-0.93240737, -0.86473146, 0.0),
 			// acceleration
 			glm::dvec3(0.0, 0.0, 0.0),
 			// mass
@@ -163,4 +163,222 @@ void Simulation::loadPreset(int presetIndex) {
 		bodies.push_back(body3);
 	}
 
+	// lagrange
+	if (presetIndex == 2) {
+		softening = 0.1;
+		dt = 0.0005;
+		bodies.clear();
+		Body body1(
+			// position
+			glm::dvec3(3.0, 0.0, 0.0),
+			// velocity
+			glm::dvec3(0.0, 0.5, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.365f, 0.976f, 1.0f)
+		);
+		Body body2(
+			// position
+			glm::dvec3(-1.5, 2.598076211353316, 0.0),
+			// velocity
+			glm::dvec3(-0.43301270189221935, -0.25 , 0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.478f, 1.0f, 0.69f)
+		);
+
+		Body body3(
+			// position
+			glm::dvec3(-1.5, -2.598076211353316, 0.0),
+			// velocity
+			glm::dvec3(0.43301270189221935, -0.25 , 0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(1.0f, 0.243f, 0.243f)
+
+		);
+
+		bodies.push_back(body1);
+		bodies.push_back(body2);
+		bodies.push_back(body3);
+	}
+	// Broucke
+	if (presetIndex == 3) {
+		softening = 0.0;
+		dt = 0.000075;
+		bodies.clear();
+		Body body1(
+			// position
+			glm::dvec3(0.0132604844, 0.0, 0.0),
+			// velocity
+			glm::dvec3(0.0, 1.054151921, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.365f, 0.976f, 1.0f)
+		);
+		Body body2(
+			// position
+			glm::dvec3(1.4157286016, 0.0, 0.0),
+			// velocity
+			glm::dvec3(0.0, -0.8440052572, 0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.478f, 1.0f, 0.69f)
+		);
+
+		Body body3(
+			// position
+			glm::dvec3(-1.4157286016, 0.0, 0.0),
+			// velocity
+			glm::dvec3(0.0, -0.2101466639, 0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(1.0f, 0.243f, 0.243f)
+
+		);
+
+		bodies.push_back(body1);
+		bodies.push_back(body2);
+		bodies.push_back(body3);
+	}
+	// O2(1.2)
+	if (presetIndex == 3) {
+		softening = 0.0;
+		dt = 0.000075;
+		bodies.clear();
+		Body body1(
+			// position
+			glm::dvec3(-1.0, 0.0, 0.0),
+			// velocity
+			glm::dvec3(-0.272600007460296, -0.432093711947155, 0.629473407171139),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.365f, 0.976f, 1.0f)
+		);
+		Body body2(
+			// position
+			glm::dvec3(1.0, 0.0, 0.0),
+			// velocity
+			glm::dvec3(-0.272600007460296, -0.432093711947155, -0.629473407171139),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.478f, 1.0f, 0.69f)
+		);
+
+		Body body3(
+			// position
+			glm::dvec3(0.0, 0.0, 1.02200578272669),
+			// velocity
+			glm::dvec3(0.45433334576716, 0.7201561865785917, 0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.2,
+			// color
+			glm::vec3(1.0f, 0.243f, 0.243f)
+
+		);
+
+		bodies.push_back(body1);
+		bodies.push_back(body2);
+		bodies.push_back(body3);
+	}
+	// pentagon
+	if (presetIndex == 4) {
+		softening = 0.0;
+		dt = 0.0001;
+		bodies.clear();
+		Body body1(
+			// position
+			glm::dvec3(3.0, 0.0, 0.0),
+			// velocity
+			glm::dvec3(0.0, 0.45, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.365f, 0.976f, 1.0f)
+		);
+		Body body2(
+			// position
+			glm::dvec3(0.9270509831248424, 2.8531695488854605, 0.0),
+			// velocity
+			glm::dvec3(-0.4279754323328191, 0.13905764746872637, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.478f, 1.0f, 0.69f)
+		);
+
+		Body body3(
+			// position
+			glm::dvec3(-2.427050983124842, 1.7633557568774196, 0.0),
+			// velocity
+			glm::dvec3(-0.26450336353161297, -0.3640576474687263, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(1.0f, 0.243f, 0.243f)
+		);
+
+		Body body4(
+			// position
+			glm::dvec3(-2.427050983124843, -1.7633557568774196, 0.0),
+			// velocity
+			glm::dvec3(0.26450336353161297, -0.3640576474687263, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(0.761, 0.447, 1.0)
+		);
+
+		Body body5(
+			// position
+			glm::dvec3(0.9270509831248417, -2.853169548885461, 0.0),
+			// velocity
+			glm::dvec3(0.42797543233281915, 0.13905764746872626, 0.0),
+			// acceleration
+			glm::dvec3(0.0, 0.0, 0.0),
+			// mass
+			1.0,
+			// color
+			glm::vec3(1.0, 0.325, 0.898)
+		);
+		bodies.push_back(body1);
+		bodies.push_back(body2);
+		bodies.push_back(body3);
+		bodies.push_back(body4);
+		bodies.push_back(body5);
+	}
 }

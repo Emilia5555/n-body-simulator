@@ -68,7 +68,7 @@ int main() {
 	Simulation simulation;
 	
 	// set which orbit the bodies should move
-	simulation.loadPreset(1);
+	simulation.loadPreset(4);
 
 
 	// buffer setup
@@ -124,34 +124,34 @@ int main() {
 	// positions and color for axis
 	std::vector<float> axisPosAndColor;
 	// x top
-	axisPosAndColor.push_back(5.0);
+	axisPosAndColor.push_back(10.0);
 	axisPosAndColor.push_back(0.0);
 	axisPosAndColor.push_back(0.0);
 
 	// x bottom
-	axisPosAndColor.push_back(-5.0);
+	axisPosAndColor.push_back(-10.0);
 	axisPosAndColor.push_back(0.0);
 	axisPosAndColor.push_back(0.0);
 
 	// y top
 	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(5.0);
+	axisPosAndColor.push_back(10.0);
 	axisPosAndColor.push_back(0.0);
 
 	// y bottom
 	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(-5.0);
+	axisPosAndColor.push_back(-10.0);
 	axisPosAndColor.push_back(0.0);
 
 	// z top
 	axisPosAndColor.push_back(0.0);
 	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(5.0);
+	axisPosAndColor.push_back(10.0);
 
 	// z bottom
 	axisPosAndColor.push_back(0.0);
 	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(-5.0);
+	axisPosAndColor.push_back(-10.0);
 
 
 	// buffer setup for axis
@@ -240,7 +240,7 @@ int main() {
 		for (Body& body : simulation.bodies) 
 		{
 			// if tail vector is too big start deleting the from front element
-			if (body.prevPositions.size() >= 800) {
+			if (body.prevPositions.size() >= 1600) {
 				body.prevPositions.erase(body.prevPositions.begin());
 			}
 			// add position to prevPostitions to create tail

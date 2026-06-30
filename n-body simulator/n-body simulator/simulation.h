@@ -1,6 +1,7 @@
 #pragma once
 #include "body.h"
 
+
 class Simulation {
 public:
 	std::vector<Body> bodies;

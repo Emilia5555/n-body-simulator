@@ -41,11 +41,11 @@ public:
 		fov = 45.0f;
 		aspectRatio = 1.0f;
 		nearPlane = 0.1f;
-		farPlane = 100.0f;
+		farPlane = 50.0f;
 
 		yaw = 0.0f;
 		pitch = 0.0f;
-		distance = 3.0f;
+		distance = 10.0f;
 		isDragging = false;
 		lastMouseX = 0.0f;
 		lastMouseY = 0.0f;
@@ -65,7 +65,7 @@ public:
 
 		yaw = 0.0f;
 		pitch = 0.0f;
-		distance = 3.0f;
+		distance = 10.0f;
 		isDragging = false;
 		lastMouseX = 0.0f;
 		lastMouseY = 0.0f;
