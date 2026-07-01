@@ -12,6 +12,11 @@
 // matrix
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+// imgui controls
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 int main() {
 
 	// GLFW setup
@@ -60,6 +65,23 @@ int main() {
 	// make objects appear infront or behind eachother
 	glEnable(GL_DEPTH_TEST);
 
+
+	// ImGui setup
+	// gotta have this
+	IMGUI_CHECKVERSION();
+	// creates context ill be working with
+	ImGui::CreateContext();
+	// stores ImGui input/output configuration
+	ImGuiIO& io = ImGui::GetIO();
+	// connects ImGui to windows
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	// conects ImGui to OpenGl 3.3 renderer
+	ImGui_ImplOpenGL3_Init("#version 330");
+	// dark theme for control panel
+	ImGui::StyleColorsDark();
+
+
+
 	// create shader programs
 	unsigned int bodyShaderProgram = createShaderProgram(vertexShaderSource, bodyFragmentShaderSource);
 	unsigned int lineShaderProgram = createShaderProgram(vertexShaderSource, lineFragmentShaderSource);
@@ -68,7 +90,7 @@ int main() {
 	Simulation simulation;
 	
 	// set which orbit the bodies should move
-	simulation.loadPreset(4);
+	simulation.loadPreset(0);
 
 
 	// buffer setup
@@ -85,12 +107,12 @@ int main() {
 
 	// holds positions of bodies
 	// cast to a float becasue openGL does not nativley have doubles
-	std::vector<float> positionAndColor;
-	setupBuffersBody(bodyVAO, bodyVBO,positionAndColor);
+	std::vector<float> bodyPosition;
+	setupBuffersBody(bodyVAO, bodyVBO,bodyPosition);
 
 	// holds positions of tails
-	std::vector<float> tailPositionsAndColor;
-	setupBuffersTail(tailVAO,tailVBO, tailPositionsAndColor);
+	std::vector<float> tailPosition;
+	setupBuffersTail(tailVAO,tailVBO, tailPosition);
 
 	// create camera
 	Camera camera(
@@ -122,36 +144,66 @@ int main() {
 	camera.updateOrbit();
 
 	// positions and color for axis
-	std::vector<float> axisPosAndColor;
-	// x top
-	axisPosAndColor.push_back(10.0);
-	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(0.0);
+	std::vector<float> axisPos;
+	// fill axisPos
+	// loop through rows
+	for (int j = 0; j < 6;j++) 
+	{
+		// loop through columns
+		for (int i = 0; i < 3;i++)
+		{
+			if (i == 0)
+			{
+				if (j == 0)
+				{
+					axisPos.push_back(10.0);
+				}
+				else if (j == 1)
+				{
+					axisPos.push_back(-10.0);
 
-	// x bottom
-	axisPosAndColor.push_back(-10.0);
-	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(0.0);
+				}
+				else
+				{
+					axisPos.push_back(0.0);
+				}
+			}
+			else if (i == 1)
+			{
+				if (j == 2)
+				{
+					axisPos.push_back(10.0);
+				}
+				else if (j == 3)
+				{
+					axisPos.push_back(-10.0);
 
-	// y top
-	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(10.0);
-	axisPosAndColor.push_back(0.0);
+				}
+				else
+				{
+					axisPos.push_back(0.0);
+				}
+			}
+			else if (i == 2)
+			{
+				if (j == 4)
+				{
+					axisPos.push_back(10.0);
+				}
+				else if (j == 5)
+				{
+					axisPos.push_back(-10.0);
 
-	// y bottom
-	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(-10.0);
-	axisPosAndColor.push_back(0.0);
-
-	// z top
-	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(10.0);
-
-	// z bottom
-	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(0.0);
-	axisPosAndColor.push_back(-10.0);
+				}
+				else
+				{
+					axisPos.push_back(0.0);
+				}
+			}
+			
+		}
+		
+	}
 
 
 	// buffer setup for axis
@@ -160,12 +212,20 @@ int main() {
 	// holds ID for vertex buffer object
 	unsigned int axisVBO = 0;
 
-	setupBuffersAxis(axisVAO, axisVBO,axisPosAndColor);
+	setupBuffersAxis(axisVAO, axisVBO,axisPos);
 
 
 	// while the user has not closed the window 
 	while (!glfwWindowShouldClose(window))
 	{
+		 //tells ImGui a new frame is starting
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		//end the ImGui window
+		ImGui::End();
+
 		// indicates color to set background (red,green, blue, alpha) uses 0-1 scale, expects float values
 		glClearColor(0.0f, 0.0f, 0.02f, 1.0f);
 		// sets the color 
@@ -195,11 +255,11 @@ int main() {
 		// makes VBO the current active GL_ARRAY_BUFFER
 		glBindBuffer(GL_ARRAY_BUFFER, axisVBO);
 		// upload data
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * axisPosAndColor.size(), axisPosAndColor.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * axisPos.size(), axisPos.data(), GL_STATIC_DRAW);
 		// set axis color
 		glUniform3f(glGetUniformLocation(lineShaderProgram, "lineColor"), 0.431, 0.431, 0.431);
 		// draw the axis
-		glDrawArrays(GL_LINES, 0, axisPosAndColor.size() / 3);
+		glDrawArrays(GL_LINES, 0, axisPos.size() / 3);
 
 
 		// repeat step forward a few times per frame to control speed
@@ -210,15 +270,15 @@ int main() {
 		// holds positions and color of bodies
 		for (Body& body : simulation.bodies) {
 			// get rid of old positions
-			positionAndColor.clear();
+			bodyPosition.clear();
 			// push back 3 floats for position
-			positionAndColor.push_back(body.position.x);
-			positionAndColor.push_back(body.position.y);
-			positionAndColor.push_back(body.position.z);
+			bodyPosition.push_back(body.position.x);
+			bodyPosition.push_back(body.position.y);
+			bodyPosition.push_back(body.position.z);
 			// push back 3 floats for color
-			//positionAndColor.push_back(body.color.x);
-			//positionAndColor.push_back(body.color.y);
-			//positionAndColor.push_back(body.color.z);
+			//bodyPosition.push_back(body.color.x);
+			//bodyPosition.push_back(body.color.y);
+			//bodyPosition.push_back(body.color.z);
 
 			// draw bodies
 			glUseProgram(bodyShaderProgram);
@@ -231,7 +291,7 @@ int main() {
 			//set color of body
 			glUniform3f(glGetUniformLocation(bodyShaderProgram, "vertexColor"), body.color.x, body.color.y, body.color.z);
 			// upload body data into VBO
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * positionAndColor.size(), positionAndColor.data(), GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * bodyPosition.size(), bodyPosition.data(), GL_DYNAMIC_DRAW);
 			glDrawArrays(GL_POINTS, 0, 1);
 
 		}
@@ -247,14 +307,14 @@ int main() {
 			body.prevPositions.push_back(body.position);
 
 			// clear before re-using
-			tailPositionsAndColor.clear();
+			tailPosition.clear();
 			// loop through prevPositions
 			for (glm::vec3 pos : body.prevPositions) 
 			{
 				// create a tail positions flat float vector for each body
-				tailPositionsAndColor.push_back(pos.x);
-				tailPositionsAndColor.push_back(pos.y);
-				tailPositionsAndColor.push_back(pos.z);
+				tailPosition.push_back(pos.x);
+				tailPosition.push_back(pos.y);
+				tailPosition.push_back(pos.z);
 			}
 			// set shader program
 			glUseProgram(lineShaderProgram);
@@ -263,15 +323,17 @@ int main() {
 			// makes VBO the current active GL_ARRAY_BUFFER
 			glBindBuffer(GL_ARRAY_BUFFER, tailVBO);
 			// upload this trail info with glVertexAtribPointer
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tailPositionsAndColor.size(), tailPositionsAndColor.data(), GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * tailPosition.size(), tailPosition.data(), GL_DYNAMIC_DRAW);
 			// set tail thickness
 			glLineWidth(3.0f);
 			// set color of tail
 			glUniform3f(glGetUniformLocation(lineShaderProgram, "lineColor"), body.color.x, body.color.y, body.color.z );
-			// draw the tail (tailPositionsAndColor.size()/3 because its looking for vertices to draw)
-			glDrawArrays(GL_LINE_STRIP, 0, tailPositionsAndColor.size() / 3);
+			// draw the tail (tailPosition.size()/3 because its looking for vertices to draw)
+			glDrawArrays(GL_LINE_STRIP, 0, tailPosition.size() / 3);
 		}
-
+		// render ImGui controls
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		// prevents screen from flickering by drawing to a back buffer and then swapping it to the front
 		glfwSwapBuffers(window);
 		// detects input events, without this line the program wouldnt respond to any input

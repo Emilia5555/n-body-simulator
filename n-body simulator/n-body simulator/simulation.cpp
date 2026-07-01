@@ -59,51 +59,51 @@ void Simulation::loadPreset(int presetIndex) {
 		bodies.clear();
 		Body body1(
 			// position
-			glm::dvec3(-0.5, 0.0, 0.0),
+			glm::dvec3(-4.0, 0.0, 0.0),
 			// velocity
-			glm::dvec3(0.0, -0.5, 0.5),
+			glm::dvec3(0.0, 0.0, 0.0),
 			// acceleration
 			glm::dvec3(0.0, 0.0, 0.0),
 			// mass
-			10.0,
+			1.0,
 			// color
 			glm::vec3(0.365f, 0.976f, 1.0f)
 		);
 		Body body2(
 			// position
-			glm::dvec3(0.5, 0.0, 0.0),
+			glm::dvec3(4.0, 0.0, 0.0),
 			// velocity
-			glm::dvec3(0.0, 0.5,-0.5),
+			glm::dvec3(0.0, 0.0, 0.0),
 			// acceleration
 			glm::dvec3(0.0, 0.0, 0.0),
 			// mass
-			10.0,
+			1.0,
 			// color
 			glm::vec3(0.478f, 1.0f, 0.69f)
 		);
 
 		Body body3(
 			// position
-			glm::dvec3(0.0, 0.5, 0.0),
+			glm::dvec3(0.0, -4.0, 0.0),
 			// velocity
-			glm::dvec3(0.5, 0.0, 0.5),
+			glm::dvec3(0.0, 0.0, 0.0),
 			// acceleration
 			glm::dvec3(0.0, 0.0, 0.0),
 			// mass
-			10.0,
+			1.0,
 			// color
 			glm::vec3(1.0f, 0.243f, 0.243f)
 
 		);
 		Body body4(
 			// position
-			glm::dvec3(0.0, -0.5, 0.0),
+			glm::dvec3(0.0, 4.0, 0.0),
 			// velocity
-			glm::dvec3(-0.5, 0.0, -0.5),
+			glm::dvec3(0.0, 0.0, 0.0),
 			// acceleration
 			glm::dvec3(0.0, 0.0, 0.0),
 			// mass
-			10.0,
+			1.0,
 			// color
 			glm::vec3(0.816f, 0.435f, 1.0f)
 		);
