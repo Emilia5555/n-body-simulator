@@ -5,6 +5,7 @@
 #include "shaders.h"
 #include <vector>
 #include <cmath>
+#include <string>
 #include "body.h"
 #include "simulation.h"
 #include "camera.h"
@@ -34,7 +35,7 @@ int main() {
 
 	// consts for window size
 	const float WINDOW_HEIGHT = 1000;
-	const float WINDOW_WIDTH = 1200;
+	const float WINDOW_WIDTH = 1600;
 
 	// creates the window (width px, height px, title, monitor for fullscreen, share context)
 	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "n-body gravity simulator", nullptr, nullptr);
@@ -48,7 +49,7 @@ int main() {
 
 
 	// adjusts where the window pops up on screen (px from top and left of screen)
-	glfwSetWindowPos(window, 1200, 100);
+	glfwSetWindowPos(window, 900, 100);
 
 
 	// applies the OpenGL context to the window, makes OpenGL work with the window we just made
@@ -227,9 +228,10 @@ int main() {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		// set window width and height
-		ImGui::SetNextWindowSize(ImVec2(300, 600));
+		ImGui::SetNextWindowSize(ImVec2(300, 0));
 		// start the imgui window
 		ImGui::Begin("controls");
+
 		// dropdown for select preset
 		const char* presets[6] = { "default","figure 8","lagrange","Broucke","3D","pentagon" };
 		// limit width of dropdown 
@@ -239,6 +241,77 @@ int main() {
 		{
 			simulation.loadPreset(currentPreset);
 		}
+
+		// make a collapsable header for each individual bodies controls
+		for(int i = 0; i < simulation.bodies.size();i++)
+		{
+			// string to hold title of collapsable header
+			std::string label = "body ";
+			label += std::to_string(i);
+			// label the header with the string label converted to a c string
+			if(ImGui::CollapsingHeader(label.c_str())) 
+			{
+				// each ImGui widget needs a unique ID
+				// create a unique ID for each component of each body by making the x0, x1.. etc
+				std::string xPositionLabel = "##positionX";
+				xPositionLabel += std::to_string(i);
+				std::string yPositionLabel = "##positionY";
+				yPositionLabel += std::to_string(i);
+				std::string zPositionLabel = "##positionZ";
+				zPositionLabel += std::to_string(i);
+
+				std::string massLabel = "##mass";
+
+				massLabel += std::to_string(i);
+				std::string velocityX = "##velocityX";
+				velocityX += std::to_string(i);
+				std::string velocityY = "##velocityY";
+				velocityY += std::to_string(i);
+				std::string velocityZ = "##velocityZ";
+				velocityZ += std::to_string(i);
+				// text creates label
+				// same line makes label appear on the left on the input box
+				// input double connects input box to double to edit (component of position)
+				// ## prevents label from being diplayed
+			
+				// controls for position components
+				ImGui::Text("position: ");
+				ImGui::Text("x: ");
+				ImGui::SameLine();
+				ImGui::InputDouble(xPositionLabel.c_str(), &simulation.bodies[i].position.x);
+				ImGui::Text("y: ");
+				ImGui::SameLine();
+				ImGui::InputDouble(yPositionLabel.c_str(), &simulation.bodies[i].position.y);
+				ImGui::Text("z: ");
+				ImGui::SameLine();
+				ImGui::InputDouble(zPositionLabel.c_str(), &simulation.bodies[i].position.z);
+
+				// controls for velocity components
+				ImGui::NewLine();
+				ImGui::Text("velocity: ");
+				ImGui::Text("x: ");
+				ImGui::SameLine();
+				ImGui::InputDouble(velocityX.c_str(), &simulation.bodies[i].velocity.x);
+				ImGui::Text("y: ");
+				ImGui::SameLine();
+				ImGui::InputDouble(velocityY.c_str(), &simulation.bodies[i].velocity.y);
+				ImGui::Text("z: ");
+				ImGui::SameLine();
+				ImGui::InputDouble(velocityZ.c_str(), &simulation.bodies[i].velocity.z);
+	
+				// controls for mass
+				ImGui::NewLine();
+				ImGui::Text("mass: ");
+				ImGui::SameLine();
+				ImGui::InputDouble(massLabel.c_str(), &simulation.bodies[i].mass);
+			
+			}
+
+		}
+
+
+
+		// pause button
 		ImGui::Checkbox("paused", &isPaused);
 		// reset sim if this button is pressed
 		if (ImGui::Button("reset"))
