@@ -74,7 +74,7 @@ int main() {
 	// stores ImGui input/output configuration
 	ImGuiIO& io = ImGui::GetIO();
 	// connects ImGui to windows
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplGlfw_InitForOpenGL(window, false);
 	// conects ImGui to OpenGl 3.3 renderer
 	ImGui_ImplOpenGL3_Init("#version 330");
 	// dark theme for control panel
@@ -89,8 +89,10 @@ int main() {
 	// simulation object
 	Simulation simulation;
 	
+	// int to store preset
+	int currentPreset = 0;
 	// set which orbit the bodies should move
-	simulation.loadPreset(0);
+	simulation.loadPreset(currentPreset);
 
 
 	// buffer setup
@@ -132,6 +134,7 @@ int main() {
 		100.0f
 	);
 
+	// set callback functions
 	// store camera pointer on glfw window so callbacks can access it
 	glfwSetWindowUserPointer(window, &camera);
 	// set glfw callback functions to my callback functions for mouse events
@@ -213,7 +216,8 @@ int main() {
 	unsigned int axisVBO = 0;
 
 	setupBuffersAxis(axisVAO, axisVBO,axisPos);
-
+	// bool to store wether or not simulator is paused
+	bool isPaused = false;
 
 	// while the user has not closed the window 
 	while (!glfwWindowShouldClose(window))
@@ -222,9 +226,30 @@ int main() {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		// set window width and height
+		ImGui::SetNextWindowSize(ImVec2(300, 600));
+		// start the imgui window
+		ImGui::Begin("controls");
+		// dropdown for select preset
+		const char* presets[6] = { "default","figure 8","lagrange","Broucke","3D","pentagon" };
+		// limit width of dropdown 
+		ImGui::SetNextItemWidth(100);
+		// if dropdown is changed, reload with new preset
+		if (ImGui::Combo("select preset", &currentPreset, presets, 6)) 
+		{
+			simulation.loadPreset(currentPreset);
+		}
+		ImGui::Checkbox("paused", &isPaused);
+		// reset sim if this button is pressed
+		if (ImGui::Button("reset"))
+		{
+			simulation.loadPreset(currentPreset);
+		}
 
 		//end the ImGui window
 		ImGui::End();
+
+		
 
 		// indicates color to set background (red,green, blue, alpha) uses 0-1 scale, expects float values
 		glClearColor(0.0f, 0.0f, 0.02f, 1.0f);
@@ -264,7 +289,10 @@ int main() {
 
 		// repeat step forward a few times per frame to control speed
 		for (int i = 0; i < 46; i++) {
-			simulation.stepForward();
+			if (!isPaused) 
+			{
+				simulation.stepForward();
+			}
 		}
 
 		// holds positions and color of bodies
@@ -300,7 +328,8 @@ int main() {
 		for (Body& body : simulation.bodies) 
 		{
 			// if tail vector is too big start deleting the from front element
-			if (body.prevPositions.size() >= 1600) {
+			// prevents tails from disappearing while paused
+			if (body.prevPositions.size() >= 1600 && !isPaused) {
 				body.prevPositions.erase(body.prevPositions.begin());
 			}
 			// add position to prevPostitions to create tail
@@ -309,6 +338,7 @@ int main() {
 			// clear before re-using
 			tailPosition.clear();
 			// loop through prevPositions
+
 			for (glm::vec3 pos : body.prevPositions) 
 			{
 				// create a tail positions flat float vector for each body

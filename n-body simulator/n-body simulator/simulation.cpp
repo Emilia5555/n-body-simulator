@@ -260,7 +260,7 @@ void Simulation::loadPreset(int presetIndex) {
 		bodies.push_back(body3);
 	}
 	// O2(1.2)
-	if (presetIndex == 3) {
+	if (presetIndex == 4) {
 		softening = 0.0;
 		dt = 0.000075;
 		bodies.clear();
@@ -308,7 +308,7 @@ void Simulation::loadPreset(int presetIndex) {
 		bodies.push_back(body3);
 	}
 	// pentagon
-	if (presetIndex == 4) {
+	if (presetIndex == 5) {
 		softening = 0.0;
 		dt = 0.0001;
 		bodies.clear();
