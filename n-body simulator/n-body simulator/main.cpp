@@ -143,7 +143,9 @@ int main() {
 	glfwSetMouseButtonCallback(window, mouseButtonCallBack);
 	glfwSetCursorPosCallback(window, mouseMoveCallback);
 	glfwSetScrollCallback(window, scrollCallback);
-
+	// use ImGui callback function for keyboard
+	glfwSetCharCallback(window,ImGui_ImplGlfw_CharCallback);
+	glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
 	// update camera positions
 	camera.updateOrbit();
 
@@ -220,6 +222,11 @@ int main() {
 	// bool to store wether or not simulator is paused
 	bool isPaused = false;
 
+	// variables for input to be stored in for add new body
+	glm::dvec3 newPosition = glm::dvec3(0.0, 0.0, 0.0);
+	glm::dvec3 newVelocity = glm::dvec3(0.0, 0.0, 0.0);
+	double newMass = 0.1;
+	glm::vec3 newColor;
 	// while the user has not closed the window 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -253,12 +260,12 @@ int main() {
 			{
 				// each ImGui widget needs a unique ID
 				// create a unique ID for each component of each body by making the x0, x1.. etc
-				std::string xPositionLabel = "##positionX";
-				xPositionLabel += std::to_string(i);
-				std::string yPositionLabel = "##positionY";
-				yPositionLabel += std::to_string(i);
-				std::string zPositionLabel = "##positionZ";
-				zPositionLabel += std::to_string(i);
+				std::string positionX = "##positionX";
+				positionX += std::to_string(i);
+				std::string positionY = "##positionY";
+				positionY += std::to_string(i);
+				std::string positionZ = "##positionZ";
+				positionZ += std::to_string(i);
 
 				std::string massLabel = "##mass";
 
@@ -278,13 +285,13 @@ int main() {
 				ImGui::Text("position: ");
 				ImGui::Text("x: ");
 				ImGui::SameLine();
-				ImGui::InputDouble(xPositionLabel.c_str(), &simulation.bodies[i].position.x);
+				ImGui::InputDouble(positionX.c_str(), &simulation.bodies[i].position.x);
 				ImGui::Text("y: ");
 				ImGui::SameLine();
-				ImGui::InputDouble(yPositionLabel.c_str(), &simulation.bodies[i].position.y);
+				ImGui::InputDouble(positionY.c_str(), &simulation.bodies[i].position.y);
 				ImGui::Text("z: ");
 				ImGui::SameLine();
-				ImGui::InputDouble(zPositionLabel.c_str(), &simulation.bodies[i].position.z);
+				ImGui::InputDouble(positionZ.c_str(), &simulation.bodies[i].position.z);
 
 				// controls for velocity components
 				ImGui::NewLine();
@@ -306,9 +313,100 @@ int main() {
 				ImGui::InputDouble(massLabel.c_str(), &simulation.bodies[i].mass);
 			
 			}
-
+			
 		}
+		// add body header
+		std::string addBody = "add body ";
+		if (ImGui::CollapsingHeader(addBody.c_str()))
+		{
 
+			
+
+			// create labels for inputs 
+			std::string newPositionX = "##newPositionX";
+			std::string positionY = "##positionY";
+			std::string positionZ = "##positionZ";
+
+			std::string massLabel = "##mass";
+
+			std::string velocityX = "##velocityX";
+			std::string velocityY = "##velocityY";
+			std::string velocityZ = "##velocityZ";
+
+			// get values for new body
+			// get and set newPosition
+			ImGui::Text("position: ");
+			ImGui::Text("x: ");
+			ImGui::SameLine();
+			ImGui::InputDouble(newPositionX.c_str(), &newPosition.x);
+			ImGui::Text("y: ");
+			ImGui::SameLine();
+			ImGui::InputDouble(positionY.c_str(), &newPosition.y);
+			ImGui::Text("z: ");
+			ImGui::SameLine();
+			ImGui::InputDouble(positionZ.c_str(), &newPosition.z);
+
+			// get and set newVelocity
+			ImGui::NewLine();
+			ImGui::Text("velocity: ");
+			ImGui::Text("x: ");
+			ImGui::SameLine();
+			ImGui::InputDouble(velocityX.c_str(), &newVelocity.x);
+			ImGui::Text("y: ");
+			ImGui::SameLine();
+			ImGui::InputDouble(velocityY.c_str(), &newVelocity.y);
+			ImGui::Text("z: ");
+			ImGui::SameLine();
+			ImGui::InputDouble(velocityZ.c_str(), &newVelocity.z);
+
+			// get and set newMass
+			ImGui::NewLine();
+			ImGui::Text("mass: ");
+			ImGui::SameLine();
+			ImGui::InputDouble(massLabel.c_str(), &newMass);
+
+			// logic for setting color 	
+			// array for colors 
+			std::vector<glm::vec3> colors;
+			colors.push_back(glm::vec3(0.365f, 0.976f, 1.0f));
+			colors.push_back(glm::vec3(0.478f, 1.0f, 0.69f));
+			colors.push_back(glm::vec3(1.0f, 0.243f, 0.243f));
+			colors.push_back(glm::vec3(0.761, 0.447, 1.0));
+			colors.push_back(glm::vec3(1.0, 0.325, 0.898));
+			colors.push_back(glm::vec3(0.329, 1, 0.439));
+			colors.push_back(glm::vec3(1, 0.976, 0.329));
+			colors.push_back(glm::vec3(1, 0.624, 0.329));
+
+			// set bodies color to next color in color array based on how many bodies currently exsist
+			int colorIndex = simulation.bodies.size();
+			// if there are more bodies in the sim than colors in the array
+			if (colorIndex >= colors.size()) 
+			{
+				// prevent color index from exceeding colors.size()
+				colorIndex = simulation.bodies.size() % colors.size();
+			}
+			newColor = colors[colorIndex];
+
+			// create new body with newPosition and newVelocity
+			Body newBody(
+				// position
+				newPosition,
+				// velocity
+				newVelocity,
+				// acceleration
+				glm::dvec3(0.0, 0.0, 0.0),
+				// mass
+				newMass,
+				// color
+				newColor
+			);
+			
+			if (ImGui::Button("add body")) 
+			{
+				// add newBody to sim
+				simulation.bodies.push_back(newBody);
+			}
+			}
 
 
 		// pause button
