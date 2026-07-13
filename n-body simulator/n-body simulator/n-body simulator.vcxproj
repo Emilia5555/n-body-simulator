@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="body.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="ImGui.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="shaders.h" />
     <ClInclude Include="shader_utils.h" />
