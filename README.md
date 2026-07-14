@@ -4,7 +4,8 @@ A real-time gravitational n-body simulator built from scratch in C++ and OpenGL.
 
 Physics are computed in double precision using Velocity Verlet integration, a symplectic integrator that conserves energy over long timescales — making it well suited for stable orbit simulation. The simulator tracks total system energy and drift in real time, providing a live measure of numerical accuracy.
 
-<img width="1920" height="1080" alt="figure 8 short" src="https://github.com/user-attachments/assets/bae7f489-7b25-4844-a3b7-a4549bb33363" />
+<img width="1280" height="720" alt="figure 8" src="https://github.com/user-attachments/assets/4bc34982-7f57-4cd7-8486-1fa2be4c2140" />
+
 
 
 ---
@@ -105,3 +106,22 @@ From your vcpkg directory, run:
 **Add Body** — insert a new body into the simulation at runtime
 
 ---
+
+## Demos
+
+3D orbit and camera controls:
+<img width="800" height="450" alt="3D and camera controls" src="https://github.com/user-attachments/assets/a41076a6-936a-46fa-a5cf-7a7adb09d1df" />
+
+Brouche orbit and add body feature
+
+<img width="1280" height="720" alt="brouche and add body" src="https://github.com/user-attachments/assets/854af6a7-18df-4693-bb03-cccf4118def8" />
+
+Lagrange orbit
+
+<img width="1280" height="720" alt="lagrange" src="https://github.com/user-attachments/assets/3fa29187-808d-430d-8a4c-38ca6452e592" />
+
+Pentagon orbit and adjust speed slider
+
+<img width="1280" height="720" alt="pentagon and speed slider" src="https://github.com/user-attachments/assets/4ab421d3-569e-4586-b169-7d7e2ff4b8a3" />
+
+
