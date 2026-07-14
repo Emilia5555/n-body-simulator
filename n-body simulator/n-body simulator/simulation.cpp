@@ -4,8 +4,8 @@
 // adjusts each bodies position by calculating the forces acting it 
 void Simulation::stepForward()
 {
-	
-	for (Body& body : bodies) 
+
+	for (Body& body : bodies)
 	{
 		// update position based on current data
 		glm::dvec3 newPosition = body.position + body.velocity * dt
@@ -38,24 +38,24 @@ void Simulation::stepForward()
 			// apply acceleration to i and j
 			bodies[i].acceleration += direction * (force / bodies[i].mass);
 			bodies[j].acceleration += -direction * (force / bodies[j].mass);
-			
-			
+
+
 		}
 	}
-	
+
 	for (Body& body : bodies)
 	{
-	// calculate new velocity with info from forces
-	// update half velocity and with new data
-	glm::dvec3 newVelocity = body.velocity + dt * 0.5 * body.acceleration;
-	body.velocity = newVelocity;
+		// calculate new velocity with info from forces
+		// update half velocity and with new data
+		glm::dvec3 newVelocity = body.velocity + dt * 0.5 * body.acceleration;
+		body.velocity = newVelocity;
 	}
 }
 
 void Simulation::loadPreset(int presetIndex) {
-	
+
 	// test preset
-	if (presetIndex == 0){
+	if (presetIndex == 0) {
 		bodies.clear();
 		Body body1(
 			// position
@@ -185,7 +185,7 @@ void Simulation::loadPreset(int presetIndex) {
 			colors[2]
 
 		);
-	
+
 		bodies.push_back(body1);
 		bodies.push_back(body2);
 		bodies.push_back(body3);
@@ -212,7 +212,7 @@ void Simulation::loadPreset(int presetIndex) {
 			// position
 			glm::dvec3(-1.5, 2.598076211353316, 0.0),
 			// velocity
-			glm::dvec3(-0.43301270189221935, -0.25 , 0),
+			glm::dvec3(-0.43301270189221935, -0.25, 0),
 			// acceleration
 			glm::dvec3(0.0, 0.0, 0.0),
 			// mass
@@ -225,7 +225,7 @@ void Simulation::loadPreset(int presetIndex) {
 			// position
 			glm::dvec3(-1.5, -2.598076211353316, 0.0),
 			// velocity
-			glm::dvec3(0.43301270189221935, -0.25 , 0),
+			glm::dvec3(0.43301270189221935, -0.25, 0),
 			// acceleration
 			glm::dvec3(0.0, 0.0, 0.0),
 			// mass
@@ -409,4 +409,34 @@ void Simulation::loadPreset(int presetIndex) {
 		bodies.push_back(body4);
 		bodies.push_back(body5);
 	}
+
+	initialEnergy = computeEnergy();
+}
+
+double Simulation::computeEnergy()
+{
+	double totalKE = 0;
+	double totalPE = 0;
+	// loop over all bodies to add up all the KE
+	for (Body body : bodies)
+	{
+		// 1/2 * mass * velocity^2
+		// dot product for velocity to multiply vectors correctly
+		totalKE += (0.5) * body.mass * glm::dot(body.velocity, body.velocity);
+	}
+	// loop over all bodies in pairs to calculate PE
+	for (int i = 0; i < bodies.size(); i++)
+	{
+		for (int j = i + 1; j < bodies.size(); j++)
+		{
+			Body body1 = bodies[i];
+			Body body2 = bodies[j];
+			// -g*m1*m2 / r
+			totalPE += ((-gravity * body1.mass * body2.mass)
+				/ glm::distance(body1.position, body2.position));
+		}
+
+	}
+
+	return totalKE + totalPE;
 }

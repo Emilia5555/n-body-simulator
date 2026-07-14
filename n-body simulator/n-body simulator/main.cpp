@@ -81,7 +81,7 @@ int main() {
 
 	// create simulation object
 	Simulation simulation;
-	
+
 	// int to store preset
 	int currentPreset = 0;
 	// set which orbit the bodies should move
@@ -103,11 +103,11 @@ int main() {
 	// holds positions of bodies
 	// cast to a float becasue openGL does not nativley have doubles
 	std::vector<float> bodyPosition;
-	setupBuffersBody(bodyVAO, bodyVBO,bodyPosition);
+	setupBuffersBody(bodyVAO, bodyVBO, bodyPosition);
 
 	// holds positions of tails
 	std::vector<float> tailPosition;
-	setupBuffersTail(tailVAO,tailVBO, tailPosition);
+	setupBuffersTail(tailVAO, tailVBO, tailPosition);
 
 	// create camera
 	Camera camera(
@@ -138,72 +138,26 @@ int main() {
 	glfwSetCursorPosCallback(window, mouseMoveCallback);
 	glfwSetScrollCallback(window, scrollCallback);
 	// use ImGui callback function for keyboard
-	glfwSetCharCallback(window,ImGui_ImplGlfw_CharCallback);
+	glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 	glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
 
-	
 
-	// positions and color for axis
-	std::vector<float> axisPos;
-	// fill axisPos
-	// loop through rows
-	for (int j = 0; j < 6;j++) 
+
+	// positions 
+	std::vector<float> axisPos =
 	{
-		// loop through columns
-		for (int i = 0; i < 3;i++)
-		{
-			if (i == 0)
-			{
-				if (j == 0)
-				{
-					axisPos.push_back(10.0);
-				}
-				else if (j == 1)
-				{
-					axisPos.push_back(-10.0);
+		// z is pushed back for x and y axis to make bodies render on top of it
+		// draw line from -10 to 10 on the x axis
+		10, 0, -0.01,
+		-10, 0,-0.01,
+		// draw line from -10 to 10 on the y axis
+		0, 10, -0.01,
+		0, -10, -0.01,
+		// draw line from -10 to 10 on the z axis
+		0, 0, 10,
+		0, 0, -10,
 
-				}
-				else
-				{
-					axisPos.push_back(0.0);
-				}
-			}
-			else if (i == 1)
-			{
-				if (j == 2)
-				{
-					axisPos.push_back(10.0);
-				}
-				else if (j == 3)
-				{
-					axisPos.push_back(-10.0);
-
-				}
-				else
-				{
-					axisPos.push_back(0.0);
-				}
-			}
-			else if (i == 2)
-			{
-				if (j == 4)
-				{
-					axisPos.push_back(10.0);
-				}
-				else if (j == 5)
-				{
-					axisPos.push_back(-10.0);
-
-				}
-				else
-				{
-					axisPos.push_back(0.0);
-				}
-			}
-			
-		}
-		
-	}
+	};
 
 
 	// buffer setup for axis
@@ -212,7 +166,7 @@ int main() {
 	// holds ID for vertex buffer object
 	unsigned int axisVBO = 0;
 
-	setupBuffersAxis(axisVAO, axisVBO,axisPos);
+	setupBuffersAxis(axisVAO, axisVBO, axisPos);
 
 	// bool to store wether or not simulator is paused
 	bool isPaused = false;
@@ -229,14 +183,14 @@ int main() {
 	while (!glfwWindowShouldClose(window))
 	{
 		// control panel
-		ImGuiControls(simulation,currentPreset,isPaused, newPosition,
+		ImGuiControls(simulation, currentPreset, isPaused, newPosition,
 			newVelocity, newMass, newColor, camera, simulationSpeed);
-		
+
 		// indicates color to set background (red,green, blue, alpha) uses 0-1 scale, expects float values
 		glClearColor(0.0f, 0.0f, 0.02f, 1.0f);
 		// sets the color 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 		// get view and projection matrix every frame
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix();
@@ -270,9 +224,10 @@ int main() {
 
 		// repeat step forward a few times per frame to control speed
 		for (int i = 0; i < simulationSpeed; i++) {
-			if (!isPaused) 
+			if (!isPaused)
 			{
 				simulation.stepForward();
+				simulation.currentEnergy = simulation.computeEnergy();
 			}
 		}
 
@@ -304,7 +259,7 @@ int main() {
 
 		// tails
 		// make a float vector representing the prevPositions of the bodies
-		for (Body& body : simulation.bodies) 
+		for (Body& body : simulation.bodies)
 		{
 			// if tail vector is too big start deleting the from front element
 			// prevents tails from disappearing while paused
@@ -318,7 +273,7 @@ int main() {
 			tailPosition.clear();
 			// loop through prevPositions
 
-			for (glm::vec3 pos : body.prevPositions) 
+			for (glm::vec3 pos : body.prevPositions)
 			{
 				// create a tail positions flat float vector for each body
 				tailPosition.push_back(pos.x);
@@ -336,7 +291,7 @@ int main() {
 			// set tail thickness
 			glLineWidth(3.0f);
 			// set color of tail
-			glUniform3f(glGetUniformLocation(lineShaderProgram, "lineColor"), body.color.x, body.color.y, body.color.z );
+			glUniform3f(glGetUniformLocation(lineShaderProgram, "lineColor"), body.color.x, body.color.y, body.color.z);
 			// draw the tail (tailPosition.size()/3 because its looking for vertices to draw)
 			glDrawArrays(GL_LINE_STRIP, 0, tailPosition.size() / 3);
 		}

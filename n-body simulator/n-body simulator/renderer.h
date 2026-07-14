@@ -46,8 +46,8 @@ void setupBuffersBody(unsigned int& VAO, unsigned int& VBO, std::vector<float>& 
 // deletes anything in buffer objects before creating new ones
 // VAO: int to hold vertex array object ID
 // VBO: int to hold vertex buffer object ID
-// tailPositionsAndColor: float vector with position and color data of tails
-void setupBuffersTail(unsigned int& VAO, unsigned int& VBO, std::vector<float> tailPositionsAndColor)
+// tailPositions: float vector with position and color data of tails
+void setupBuffersTail(unsigned int& VAO, unsigned int& VBO, std::vector<float> tailPositions)
 {
 	// clear anything that was in the buffers
 	glDeleteVertexArrays(1, &VAO);
@@ -64,14 +64,14 @@ void setupBuffersTail(unsigned int& VAO, unsigned int& VBO, std::vector<float> t
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 	// allocates space for tail position vector
-	glBufferData(GL_ARRAY_BUFFER, tailPositionsAndColor.size() * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tailPositions.size() * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
 
 	// tells openGL that VBO has position data at location 0, which is the 3 floats with no offset
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	// enables input slot 0
 	glEnableVertexAttribArray(0);
-	
+
 	// enables input slot 1
 	glEnableVertexAttribArray(1);
 

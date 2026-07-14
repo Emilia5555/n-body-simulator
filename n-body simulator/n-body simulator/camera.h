@@ -67,7 +67,7 @@ public:
 
 		yaw = 0.0f;
 		pitch = 0.0f;
-		distance = 10.0f;
+		distance = 15.0f;
 		isDragging = false;
 		lastMouseX = 0.0f;
 		lastMouseY = 0.0f;

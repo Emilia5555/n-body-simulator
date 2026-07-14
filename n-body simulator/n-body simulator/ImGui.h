@@ -6,11 +6,11 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-void ImGuiControls(Simulation &simulation, int &currentPreset, 
-	bool &isPaused, glm::dvec3 &newPosition, glm::dvec3 &newVelocity, 
-	double &newMass, glm::vec3 &newColor, Camera &camera,int &simulationSpeed)
+void ImGuiControls(Simulation& simulation, int& currentPreset,
+	bool& isPaused, glm::dvec3& newPosition, glm::dvec3& newVelocity,
+	double& newMass, glm::vec3& newColor, Camera& camera, int& simulationSpeed)
 {
-	
+
 	//tells ImGui a new frame is starting
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -148,7 +148,7 @@ void ImGuiControls(Simulation &simulation, int &currentPreset,
 		ImGui::InputDouble(massLabel.c_str(), &newMass);
 
 		// logic for setting color 	
-		
+
 
 		// set bodies color to next color in color array based on how many bodies currently exsist
 		int colorIndex = simulation.bodies.size();
@@ -189,6 +189,12 @@ void ImGuiControls(Simulation &simulation, int &currentPreset,
 	ImGui::Text("speed: ");
 	ImGui::SameLine();
 	ImGui::SliderInt("##speed", &simulationSpeed, 1, 1000);
+
+	// energy
+	ImGui::Text("total energy: %f", simulation.currentEnergy);
+	double drift = abs(simulation.initialEnergy - simulation.currentEnergy)
+		/ abs(simulation.initialEnergy) * 100;
+	ImGui::Text("energy drift: %f", drift);
 
 	// reset sim if this button is pressed
 	if (ImGui::Button("reset"))

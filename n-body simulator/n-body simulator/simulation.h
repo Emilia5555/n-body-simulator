@@ -9,17 +9,12 @@ public:
 	// timestep
 	double dt = 0.0001;
 	double softening = 0.2;
-	double simulationTime;
 
 	double initialEnergy;
 	double currentEnergy;
 
 	// advances the simulation by one frame
 	void stepForward();
-
-	// reloads current preset
-	// presetIndex: which preset to re-load
-	void reset(int presetIndex);
 
 	// calculates the total mechanical energy of the system
 	// returns total energy
@@ -28,7 +23,7 @@ public:
 	// clears the bodies vector and fills it with the starting info for the given preset
 	// presetIndex: which preset to load
 	void loadPreset(int presetIndex);
-	
+
 	// array for colors 
 	std::vector<glm::vec3> colors = {
 		glm::vec3(0.365f, 0.976f, 1.0f),
