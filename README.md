@@ -4,7 +4,8 @@ A real-time gravitational n-body simulator built from scratch in C++ and OpenGL.
 
 Physics are computed in double precision using Velocity Verlet integration, a symplectic integrator that conserves energy over long timescales — making it well suited for stable orbit simulation. The simulator tracks total system energy and drift in real time, providing a live measure of numerical accuracy.
 
-![figure-8 choreography](add_gif_here)
+![figure-8 choreography](<img width="1920" height="1080" alt="figure 8 short" src="https://github.com/user-attachments/assets/588dc956-878e-4e22-9ab4-4f30e2802ffe" />
+)
 
 ---
 
